@@ -1,30 +1,25 @@
 import React from 'react';
-import { View, Modal, Button, Image, Text, StyleSheet } from 'react-native';
+import { View, Button, Image, Text, StyleSheet } from 'react-native';
 
 const PlaceDetail = (props: any) => {
     return (
-        <Modal visible={props.selectedPlace !== null} animationType='slide'>
-            <View style={styles.modelContainer}>
-                {   
-                    props.selectedPlace ? 
-                        (<View>
-                            <Text style={styles.title}>{props.selectedPlace.placeName}</Text>
-                            <Image style={styles.image} source={props.selectedPlace.image}></Image>
-                        </View>) : null 
-                }
-                <View style={styles.buttonContainer}>
-                    <Button title='Delete' color='red' onPress={() => props.onDelete(props.selectedPlace.key)}></Button>
-                </View>
-                <View style={styles.buttonContainer}>
-                    <Button title='Close' onPress={props.onModelClosed}></Button>
-                </View>
+        <View style={styles.container}>
+            {   
+                props.selectedPlace ? 
+                    (<View>
+                        <Text style={styles.title}>{props.selectedPlace.placeName}</Text>
+                        <Image style={styles.image} source={props.selectedPlace.image}></Image>
+                    </View>) : null 
+            }
+            <View style={styles.buttonContainer}>
+                <Button title='Delete' color='red' onPress={() => props.onDelete(props.selectedPlace.key)}></Button>
             </View>
-        </Modal>
+        </View>
         );
 };
 
 const styles = StyleSheet.create({
-    modelContainer: {
+    container: {
         margin: 20
     },
     image: {

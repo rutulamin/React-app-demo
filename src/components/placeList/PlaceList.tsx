@@ -5,12 +5,11 @@ import ListItem from '../listIem/ListItem';
 const PlaceList = (props: any) => {
     return (
         <FlatList style={styles.container} data={props.places} renderItem={(info: any) => (
-            <TouchableOpacity onPress={() => props.onPlaceSelected(info.item.key)}>
-                <ListItem place={info.item} 
-                    onPlaceSelected={props.onPlaceSelected}></ListItem>
+            <TouchableOpacity onPress={() => props.onPlaceSelected(info.item.key, info.item.placeName)}>
+                <ListItem place={info.item}></ListItem>
             </TouchableOpacity>
         )}/>
-        );
+    );
 };
 
 const styles = StyleSheet.create({

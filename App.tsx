@@ -1,65 +1,74 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import PlaceInput from './src/components/placeInput/PlaceInput';
-import PlaceList from './src/components/placeList/PlaceList';
-import PlaceDetail from './src/components/placeDetail/PlaceDetail';
-import { connect } from 'react-redux';
-import { addPlace, selectPlace, closePlace, deletePlace } from './src/store/action/placeAction';
+import React, { Component } from 'react';
+import { connect, Provider } from 'react-redux';
+import { createStackNavigator } from 'react-navigation-stack';
+import Auth from './src/screen/Auth/Auth';
+import { createAppContainer } from 'react-navigation';
+import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
+import mainTabNavigator from './src/screen/mainTab/mainTab';
+import store from './src/store/store';
+import PlaceDetail from './src/screen/PlaceDetail/PlaceDetail';
+import SideDrawer from './src/screen/SideDrawer/SideDrawer';
+import Icon from 'react-native-vector-icons/Ionicons';
 
-const App: React.FC = (props: any) => {
-	function addPlaces(data: any) {
-		props.addPlace(data);
-	}
-
-	function onPlaceSelect(key: any) {
-		props.selectPlace(key);
-	}
-
-	function onCloseModel() {
-		props.closePlace();
-	}
-
-	function onDeletePlace (key: any) {
-		props.deletePlace(key);
-	}
-	
-	return (
-		<View style={style.container}>
-			<PlaceInput onAdded={addPlaces}></PlaceInput>
-			<PlaceList places={props.places} onPlaceSelected={onPlaceSelect}></PlaceList>
-			<PlaceDetail selectedPlace={props.selectedPlace}
-				onModelClosed={onCloseModel} onDelete={onDeletePlace}></PlaceDetail>
-		</View>
-	);
-  
-};
-
-const style = StyleSheet.create({
-	container: {
-		flex: 1,
-		display: 'flex',
-		flexDirection: 'column',
-		justifyContent: 'flex-start',
-		alignItems: 'flex-start',
-		padding: 20,
-		flexWrap: 'wrap',
+const AppNavigator = createStackNavigator({
+	Home: {
+		screen: Auth,
 	},
+	Tabs: {
+		screen: mainTabNavigator,
+		navigationOptions: ({ navigation }) => ({
+			headerLeft: () => (
+				<Icon name="md-menu" size={30} onPress={() => {
+					navigation.dispatch(DrawerActions.openDrawer());
+				}}/>),
+			headerLeftContainerStyle: {
+				paddingLeft: 15,
+			},
+			headerTitle: (navigation.router?.getPathAndParamsForState(navigation.state) || {}).path,
+		})
+	},
+	PlaceDetail: {
+		screen: PlaceDetail,
+		navigationOptions: ({ navigation }) => ({
+			title: navigation.state.params?.name,
+		})
+	}
+}, {
+	initialRouteName: 'Home'
+});
+
+const SideDrawerNavigator = createDrawerNavigator({
+	Home: {
+		screen: AppNavigator,
+		navigationOptions: {
+			drawerIcon: <Icon name="md-home" size={30} />
+		}
+	},
+	SignOut: {
+		screen: SideDrawer,
+		navigationOptions: {
+			title: 'Log Out',
+			drawerIcon: <Icon name="ios-log-out" size={30} />
+		}
+	}
+}, {
+	initialRouteName: 'Home',
 });
 
 const mapStateToProps = (state: any) => {
     return {
-		places: state.place.places,
-		selectedPlace: state.place.selectedPlace
+        places: state.place.places
     }
 }
 
-const mapDispatchToProps = (dispatch: any) => {
-    return {
-		addPlace: (placeData: any) => dispatch(addPlace(placeData)),
-		selectPlace: (placeId: any) => dispatch(selectPlace(placeId)),
-		closePlace: () => dispatch(closePlace()),
-		deletePlace: (placeId: any) => dispatch(deletePlace(placeId)),
-    }
-}
+const Navigation = connect(mapStateToProps, null)(createAppContainer(SideDrawerNavigator));
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default class App extends Component {
+	render() {
+		return (
+			<Provider store={store}>
+				<Navigation ></Navigation>
+			</Provider>
+		)
+	}
+};
